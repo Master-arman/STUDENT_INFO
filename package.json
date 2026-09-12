@@ -1,0 +1,24 @@
+{
+  "name": "student-academic-information-system",
+  "version": "1.0.0",
+  "description": "Student Academic Information System built with XML, DTD, XSD, XSLT, and an interactive AngularJS dashboard.",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx -y http-server . -p 8000 -c-1 -o /index.html",
+    "dev": "npx -y http-server . -p 8000 -c-1 -o /index.html",
+    "serve": "npx -y http-server . -p 8000 -c-1",
+    "test": "node test_e2e.js",
+    "validate": "node validate.js"
+  },
+  "keywords": [
+    "xml",
+    "dtd",
+    "xsd",
+    "xslt",
+    "angularjs",
+    "student-portal",
+    "crud"
+  ],
+  "author": "Master-arman",
+  "license": "MIT"
+}
