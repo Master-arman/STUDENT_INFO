@@ -55,25 +55,34 @@ The application implements a **Dual-Pipeline Architecture**:
 | `id` | String (`S\d{3,}`) | Primary Key, Unique, XML ID | `^S\d{3,}$` (e.g. S101, S102) | Unique identifier conforming to XML ID token requirements |
 | `name` | String | Max 50 chars, Alphabetic & spaces | `^[A-Za-z\s]{1,50}$` | Student's registered full name |
 | `email` | String | RFC 5322 pattern, Unique | RFC 5322 Email regex | Institute-issued communication address |
-| `department` | String | Enumerated (`CE`, `IT`, `EXTC`) | `CE`, `IT`, `EXTC` | Degree branch / Engineering department |
+| `department` | String | Enumerated | Computer Engineering, Information Technology, Electronics | Degree branch / Engineering department |
 | `semester` | Integer | Range `1 <= semester <= 8` | `1 <= semester <= 8` | Current enrolled academic term |
 | `marks` | Float / Int | Range `0 <= marks <= 100` | `0.0 <= marks <= 100.0` | Aggregate percentage / performance score |
 
 ---
 
-## 👥 User Roles & Personas
+## 🧪 End-to-End Test Matrix & Verification
 
-- **Administrator**: Full CRUD access (enroll students, edit records, delete records), live XML editor with real-time DTD schema validation, and XML export/import.
-- **Faculty / Evaluator**: Read-only access with instant multi-parameter keyword search, department and semester filtering, score inspection, and dynamic XSLT grade card rendering.
+| Test Scenario | Input Action | Expected Behavior | Actual System Verdict |
+| :--- | :--- | :--- | :--- |
+| **DTD Entity Validation** | Delete `<email>` node from `students.xml` and run validator | Validator reports a sequence violation and rejects the file | ✅ Conforms (Fails parsing) |
+| **Duplicate ID Restriction** | Input `S101` in the Add Form and submit | Alert displays stating the ID already exists; array length is unchanged | ✅ Conforms (Action blocked) |
+| **Primary Key Immutability** | Click "Edit" on row `S102` | Student ID field switches to disabled (`ng-disabled="true"`) | ✅ Conforms (Field locked) |
+| **Dynamic Multi-Search** | Type "Computer" in the search bar | Table updates to display only Computer Engineering students | ✅ Conforms (Immediate update) |
+| **Record Elimination** | Click "Delete" on `S103` and confirm prompt | Row `S103` is removed from the view and `$scope.students` | ✅ Conforms (Array updated) |
+| **Empty State Fallback** | Type an unmatched string like "XYZ999" | Table hides body rows and presents "No matching student records found" | ✅ Conforms (Fallback rendered) |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Running Tests & Launching
 
-No build tools or server dependencies required!
-
-1. Clone or download this repository:
+1. **Run Automated Test Matrix**:
    ```bash
-   git clone <YOUR_GITHUB_REPO_URL>
+   node test_e2e.js
    ```
-2. Open `index.html` directly in any modern browser (Chrome, Edge, Firefox, Safari).
+2. **Run Standalone XML/DTD Validator**:
+   ```bash
+   node validate.js
+   ```
+3. **Launch Web Application**:
+   Open `index.html` directly in any modern browser.
