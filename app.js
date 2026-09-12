@@ -18,66 +18,63 @@
         { id: "S105", name: "Siddharth Rao", email: "siddharth.rao@engg.edu", department: "Information Technology", semester: 2, marks: 38 }
     ];
 
-    // Embedded XSLT Stylesheet for client-side XSLT rendering
+    // Embedded XSLT Stylesheet for client-side XSLT rendering (Phase 6 Presentation Engine)
     const EMBEDDED_XSLT = `<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="html" indent="yes" encoding="UTF-8"/>
+    <xsl:output method="html" encoding="UTF-8" indent="yes"/>
     <xsl:template match="/">
-        <div class="xslt-rendered-view">
-            <div class="xslt-header" style="text-align:center; margin-bottom:24px; padding:20px; background:linear-gradient(135deg,#0f172a,#1e293b); color:#fff; border-radius:12px;">
-                <h2 style="margin:0 0 6px 0; font-size:1.4rem;">Official Academic Grade Cards &amp; Transcripts</h2>
-                <p style="margin:0; color:#94a3b8; font-size:0.85rem;">Generated via XSLT Presentation Pipeline (students.xml + students.xsl)</p>
+        <div class="report-card" style="max-width:960px; margin:0 auto; background:#ffffff; padding:25px; border-radius:12px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.08); border:1px solid #e2e8f0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:12px; margin-bottom:16px;">
+                <h2 style="color:#0f172a; margin:0; font-size:1.25rem;">Academic Roster (Direct XML/XSLT Rendering)</h2>
+                <span style="font-size:0.75rem; background:#e0e7ff; color:#3730a3; padding:4px 10px; border-radius:20px; font-weight:700;">Pipeline 1 Active</span>
             </div>
-            <div class="student-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:20px;">
-                <xsl:for-each select="students/student">
-                    <xsl:sort select="marks" data-type="number" order="descending"/>
-                    <div class="grade-card" style="background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:18px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); display:flex; flex-direction:column; justify-content:space-between;">
-                        <div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:10px; margin-bottom:12px;">
-                                <span style="font-weight:700; font-family:monospace; background:#e0e7ff; color:#3730a3; padding:3px 8px; border-radius:6px; font-size:0.85rem;"><xsl:value-of select="@id"/></span>
-                                <span style="font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:12px; text-transform:uppercase;" class="dept-pill dept-{department}"><xsl:value-of select="department"/></span>
-                            </div>
-                            <h3 style="font-size:1.1rem; font-weight:700; margin:0 0 4px 0; color:#0f172a;"><xsl:value-of select="name"/></h3>
-                            <div style="font-size:0.8rem; color:#64748b; margin-bottom:12px;"><xsl:value-of select="email"/></div>
-                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#f8fafc; padding:10px; border-radius:8px; margin-bottom:14px; font-size:0.8rem;">
-                                <div>
-                                    <div style="color:#64748b; font-size:0.7rem; font-weight:600; text-transform:uppercase;">Semester</div>
-                                    <div style="font-weight:700; color:#0f172a;">Term <xsl:value-of select="semester"/></div>
-                                </div>
-                                <div>
-                                    <div style="color:#64748b; font-size:0.7rem; font-weight:600; text-transform:uppercase;">Status</div>
-                                    <div style="font-weight:700;">
-                                        <xsl:choose>
-                                            <xsl:when test="marks &gt;= 40"><span style="color:#10b981;">PASS</span></xsl:when>
-                                            <xsl:otherwise><span style="color:#ef4444;">ARREAR</span></xsl:otherwise>
-                                        </xsl:choose>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px dashed #e2e8f0;">
-                            <span style="font-size:1.25rem; font-weight:800; color:#4f46e5;"><xsl:value-of select="marks"/>%</span>
-                            <xsl:choose>
-                                <xsl:when test="marks &gt;= 90">
-                                    <span style="background:#10b981; color:#fff; padding:3px 10px; border-radius:6px; font-size:0.75rem; font-weight:700;">Grade O (Outstanding)</span>
-                                </xsl:when>
-                                <xsl:when test="marks &gt;= 75">
-                                    <span style="background:#3b82f6; color:#fff; padding:3px 10px; border-radius:6px; font-size:0.75rem; font-weight:700;">Grade A (Distinction)</span>
-                                </xsl:when>
-                                <xsl:when test="marks &gt;= 60">
-                                    <span style="background:#f59e0b; color:#fff; padding:3px 10px; border-radius:6px; font-size:0.75rem; font-weight:700;">Grade B (First Class)</span>
-                                </xsl:when>
-                                <xsl:when test="marks &gt;= 40">
-                                    <span style="background:#6366f1; color:#fff; padding:3px 10px; border-radius:6px; font-size:0.75rem; font-weight:700;">Grade C (Pass)</span>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <span style="background:#ef4444; color:#fff; padding:3px 10px; border-radius:6px; font-size:0.75rem; font-weight:700;">Grade F (Fail)</span>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </div>
-                    </div>
-                </xsl:for-each>
-            </div>
+            <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                <thead>
+                    <tr style="background-color:#0f172a; color:#ffffff;">
+                        <th style="padding:12px; text-align:left; font-size:13px; font-weight:700; border-top-left-radius:8px;">Student ID</th>
+                        <th style="padding:12px; text-align:left; font-size:13px; font-weight:700;">Name</th>
+                        <th style="padding:12px; text-align:left; font-size:13px; font-weight:700;">Email</th>
+                        <th style="padding:12px; text-align:left; font-size:13px; font-weight:700;">Department</th>
+                        <th style="padding:12px; text-align:left; font-size:13px; font-weight:700;">Semester</th>
+                        <th style="padding:12px; text-align:left; font-size:13px; font-weight:700;">Marks</th>
+                        <th style="padding:12px; text-align:left; font-size:13px; font-weight:700; border-top-right-radius:8px;">Academic Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <xsl:for-each select="students/student">
+                        <tr style="border-bottom:1px solid #e2e8f0;">
+                            <td style="padding:12px; font-size:13px;"><span style="font-family:monospace; font-weight:700; background:#e0e7ff; color:#3730a3; padding:3px 8px; border-radius:4px;"><xsl:value-of select="@id"/></span></td>
+                            <td style="padding:12px; font-size:13px; font-weight:600; color:#0f172a;"><xsl:value-of select="name"/></td>
+                            <td style="padding:12px; font-size:13px; color:#64748b;"><xsl:value-of select="email"/></td>
+                            <td style="padding:12px; font-size:13px;"><span class="dept-pill dept-{department}" style="padding:2px 8px; border-radius:12px; font-size:11px; font-weight:700;"><xsl:value-of select="department"/></span></td>
+                            <td style="padding:12px; font-size:13px; color:#475569;">Semester <xsl:value-of select="semester"/></td>
+                            <td style="padding:12px; font-size:13px; font-weight:800;">
+                                <xsl:choose>
+                                    <xsl:when test="marks &lt; 40">
+                                        <span style="color:#dc2626; background:#fee2e2; padding:3px 8px; border-radius:4px;"><xsl:value-of select="marks"/>%</span>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <span style="color:#16a34a; background:#dcfce7; padding:3px 8px; border-radius:4px;"><xsl:value-of select="marks"/>%</span>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </td>
+                            <td style="padding:12px; font-size:13px;">
+                                <xsl:choose>
+                                    <xsl:when test="marks &gt;= 75">
+                                        <span style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:4px; font-weight:700; font-size:12px;">Distinction</span>
+                                    </xsl:when>
+                                    <xsl:when test="marks &gt;= 40">
+                                        <span style="background:#dcfce7; color:#166534; padding:3px 8px; border-radius:4px; font-weight:700; font-size:12px;">Passed</span>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-weight:700; font-size:12px;">Remedial Required</span>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </td>
+                        </tr>
+                    </xsl:for-each>
+                </tbody>
+            </table>
         </div>
     </xsl:template>
 </xsl:stylesheet>`;
