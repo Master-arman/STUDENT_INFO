@@ -507,24 +507,41 @@
                     }
                 }
 
+                // Strict DTD Sequence Enforcement: (name, email, department, semester, marks)
+                const expectedSequence = ['name', 'email', 'department', 'semester', 'marks'];
+                const actualChildren = Array.from(el.children).map(c => c.nodeName);
+
+                // Check missing mandatory elements
+                expectedSequence.forEach(exp => {
+                    if (!actualChildren.includes(exp)) {
+                        diag.isValid = false;
+                        diag.errors.push(`Student #${idx} (${id || 'Unknown'}): Missing mandatory element <${exp}>. (DTD sequence requires: name, email, department, semester, marks)`);
+                    }
+                });
+
+                // Check exact sequential ordering
+                let seqValid = true;
+                for (let i = 0; i < actualChildren.length && i < expectedSequence.length; i++) {
+                    if (actualChildren[i] !== expectedSequence[i]) {
+                        seqValid = false;
+                        diag.isValid = false;
+                        diag.errors.push(`Student #${idx} (${id || 'Unknown'}): Invalid element ordering. Found <${actualChildren[i]}>, expected <${expectedSequence[i]}> at position ${i+1}.`);
+                        break;
+                    }
+                }
+
                 const nameEl = el.querySelector('name');
                 const emailEl = el.querySelector('email');
                 const deptEl = el.querySelector('department');
                 const semEl = el.querySelector('semester');
                 const marksEl = el.querySelector('marks');
 
-                if (!nameEl) {
-                    diag.isValid = false;
-                    diag.errors.push(`Student #${idx}: Missing child element <name>`);
-                } else if (!/^[A-Za-z\s]{1,50}$/.test(nameEl.textContent.trim())) {
+                if (nameEl && !/^[A-Za-z\s]{1,50}$/.test(nameEl.textContent.trim())) {
                     diag.isValid = false;
                     diag.errors.push(`Student ${id || '#' + idx}: Name '${nameEl.textContent}' invalid. Max 50 alphabetic/spaces.`);
                 }
 
-                if (!emailEl) {
-                    diag.isValid = false;
-                    diag.errors.push(`Student #${idx}: Missing child element <email>`);
-                } else {
+                if (emailEl) {
                     const em = emailEl.textContent.trim();
                     if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(em)) {
                         diag.isValid = false;
@@ -538,18 +555,12 @@
                     }
                 }
 
-                if (!deptEl) {
-                    diag.isValid = false;
-                    diag.errors.push(`Student #${idx}: Missing child element <department>`);
-                } else if (!['Computer Engineering', 'Information Technology', 'Electronics', 'CE', 'IT', 'EXTC'].includes(deptEl.textContent.trim())) {
+                if (deptEl && !['Computer Engineering', 'Information Technology', 'Electronics', 'CE', 'IT', 'EXTC'].includes(deptEl.textContent.trim())) {
                     diag.isValid = false;
                     diag.errors.push(`Student ${id || '#' + idx}: Department '${deptEl.textContent}' invalid. Allowed: [Computer Engineering, Information Technology, Electronics]`);
                 }
 
-                if (!semEl) {
-                    diag.isValid = false;
-                    diag.errors.push(`Student #${idx}: Missing child element <semester>`);
-                } else {
+                if (semEl) {
                     const sVal = parseInt(semEl.textContent.trim(), 10);
                     if (isNaN(sVal) || sVal < 1 || sVal > 8) {
                         diag.isValid = false;
@@ -557,10 +568,7 @@
                     }
                 }
 
-                if (!marksEl) {
-                    diag.isValid = false;
-                    diag.errors.push(`Student #${idx}: Missing child element <marks>`);
-                } else {
+                if (marksEl) {
                     const mVal = parseFloat(marksEl.textContent.trim());
                     if (isNaN(mVal) || mVal < 0 || mVal > 100) {
                         diag.isValid = false;
@@ -570,6 +578,61 @@
             });
 
             return diag;
+        };
+
+        // Fault Injection Test Scenarios for Demonstration & Lab Verification
+        $scope.injectFault = function (type) {
+            if (type === 'missing_node') {
+                $scope.xmlCode = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="students.xsl"?>
+<!DOCTYPE students SYSTEM "students.dtd">
+<students>
+    <student id="S106">
+        <name>Anil</name>
+        <department>Information Technology</department>
+    </student>
+</students>`;
+                $scope.showToast('Injected Fault: Missing mandatory <email>, <semester>, <marks> nodes', 'error');
+            } else if (type === 'duplicate_id') {
+                $scope.xmlCode = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="students.xsl"?>
+<!DOCTYPE students SYSTEM "students.dtd">
+<students>
+    <student id="S101">
+        <name>Aarav Sharma</name>
+        <email>aarav.sharma@engg.edu</email>
+        <department>Computer Engineering</department>
+        <semester>6</semester>
+        <marks>88</marks>
+    </student>
+    <student id="S101">
+        <name>Duplicate Record</name>
+        <email>duplicate@engg.edu</email>
+        <department>Information Technology</department>
+        <semester>4</semester>
+        <marks>75</marks>
+    </student>
+</students>`;
+                $scope.showToast('Injected Fault: Duplicate Primary Key ID (S101)', 'error');
+            } else if (type === 'invalid_order') {
+                $scope.xmlCode = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="students.xsl"?>
+<!DOCTYPE students SYSTEM "students.dtd">
+<students>
+    <student id="S101">
+        <email>aarav.sharma@engg.edu</email>
+        <name>Aarav Sharma</name>
+        <department>Computer Engineering</department>
+        <semester>6</semester>
+        <marks>88</marks>
+    </student>
+</students>`;
+                $scope.showToast('Injected Fault: Invalid Element Ordering (<email> before <name>)', 'error');
+            } else if (type === 'restore') {
+                $scope.syncXmlCode();
+                $scope.showToast('Restored Canonical Valid XML', 'success');
+            }
+            $scope.validateXmlDtd();
         };
 
         // Apply XML in code editor to dynamic collection
