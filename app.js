@@ -133,9 +133,53 @@
             type: 'info'
         };
 
+        // ==========================================
+        // Phase 12: XML Integration & Dynamic Sync Bridge
+        // ==========================================
+
+        // Asynchronous hydration from students.xml
+        $scope.loadFromXML = function() {
+            $http.get("students.xml", {
+                headers: { "Content-Type": "application/xml" },
+                responseType: "text"
+            }).then(function(response) {
+                var parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(response.data, "application/xml");
+
+                // Check for parser errors
+                var parseError = xmlDoc.getElementsByTagName("parsererror");
+                if (parseError.length > 0) {
+                    $scope.notifyUser("XML Parsing Error: Invalid structure in students.xml", true);
+                    return;
+                }
+
+                var studentNodes = xmlDoc.getElementsByTagName("student");
+                var loadedList = [];
+
+                for (var i = 0; i < studentNodes.length; i++) {
+                    var node = studentNodes[i];
+                    loadedList.push({
+                        id: node.getAttribute("id"),
+                        name: node.getElementsByTagName("name")[0].textContent,
+                        email: node.getElementsByTagName("email")[0].textContent,
+                        department: node.getElementsByTagName("department")[0].textContent,
+                        semester: parseInt(node.getElementsByTagName("semester")[0].textContent, 10),
+                        marks: parseFloat(node.getElementsByTagName("marks")[0].textContent)
+                    });
+                }
+
+                $scope.students = loadedList;
+                $scope.saveState();
+                $scope.notifyUser("Database synchronized with students.xml (" + loadedList.length + " records loaded)", false);
+            }).catch(function(error) {
+                console.warn("Direct XML sync unavailable (CORS/HTTP error). Retaining default array data.", error);
+            });
+        };
+
         // --- Initialization Lifecycle ---
         $scope.init = function () {
             $scope.loadData();
+            $scope.loadFromXML(); // Phase 12: Asynchronous sync from students.xml
             $scope.syncXmlCode();
             $timeout(function () {
                 $scope.renderXslt();
