@@ -1,1 +1,194 @@
+/* Phase 11: Production-Ready Responsive Styling (style.css) */
 @import url('styles.css');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    padding: 0;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+header {
+    margin-bottom: 25px;
+}
+
+header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+header p {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    border: 1px solid #e2e8f0;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.card-header h3 {
+    font-size: 16px;
+    color: #334155;
+}
+
+.badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.badge-new { background-color: #e0e7fe; color: #0369a1; }
+.badge-edit { background-color: #fef3c7; color: #b45309; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #475569;
+}
+
+.form-group input, .form-group select {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    border-color: #3b82f6;
+}
+
+.error-text {
+    color: #ef4444;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.form-actions {
+    padding: 12px 20px 20px 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-save { background-color: #2563eb; color: #ffffff; }
+.btn-save:hover { background-color: #1d4ed8; }
+.btn-save:disabled { background-color: #94a3b8; cursor: not-allowed; }
+.btn-cancel { background-color: #64748b; color: #ffffff; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.btn-edit { background-color: #f59e0b; color: #ffffff; }
+.btn-delete { background-color: #ef4444; color: #ffffff; }
+
+.toolbar {
+    display: flex;
+    gap: 15px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.search-box { flex: 2; }
+.filter-box { flex: 1; }
+
+.toolbar input, .toolbar select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 20px;
+    text-align: left;
+    font-size: 13px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.data-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+}
+
+.mark-pass { color: #15803d; font-weight: 600; }
+.mark-fail { color: #b91c1c; font-weight: 600; }
+
+.status-pill {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.pill-dist { background-color: #dcfce7; color: #15803d; }
+.pill-pass { background-color: #f1f5f9; color: #475569; }
+.pill-fail { background-color: #fee2e2; color: #991b1b; }
+
+.action-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.empty-state {
+    text-align: center;
+    color: #94a3b8;
+    padding: 30px !important;
+}
+
+@media (max-width: 768px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .toolbar { flex-direction: column; }
+    .data-table { display: block; overflow-x: auto; }
+}
