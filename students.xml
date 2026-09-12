@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE students SYSTEM "students.dtd">
+<?xml-stylesheet type="text/xsl" href="students.xsl"?>
+<students>
+    <student id="S101">
+        <name>Aarav Sharma</name>
+        <email>aarav.sharma@inst.edu</email>
+        <department>CE</department>
+        <semester>6</semester>
+        <marks>92.5</marks>
+    </student>
+    <student id="S102">
+        <name>Priya Patel</name>
+        <email>priya.patel@inst.edu</email>
+        <department>IT</department>
+        <semester>4</semester>
+        <marks>88.0</marks>
+    </student>
+    <student id="S103">
+        <name>Rohan Kulkarni</name>
+        <email>rohan.kulkarni@inst.edu</email>
+        <department>EXTC</department>
+        <semester>8</semester>
+        <marks>74.5</marks>
+    </student>
+    <student id="S104">
+        <name>Ananya Iyer</name>
+        <email>ananya.iyer@inst.edu</email>
+        <department>CE</department>
+        <semester>6</semester>
+        <marks>95.0</marks>
+    </student>
+    <student id="S105">
+        <name>Vikram Singh</name>
+        <email>vikram.singh@inst.edu</email>
+        <department>IT</department>
+        <semester>2</semester>
+        <marks>63.0</marks>
+    </student>
+    <student id="S106">
+        <name>Sneha Nair</name>
+        <email>sneha.nair@inst.edu</email>
+        <department>EXTC</department>
+        <semester>5</semester>
+        <marks>81.2</marks>
+    </student>
+</students>

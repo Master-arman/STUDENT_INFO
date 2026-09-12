@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Root Element -->
+  <xs:element name="students">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="student" type="StudentType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+    <!-- Unique ID Constraint -->
+    <xs:unique name="UniqueStudentId">
+      <xs:selector xpath="student"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+    <!-- Unique Email Constraint -->
+    <xs:unique name="UniqueStudentEmail">
+      <xs:selector xpath="student"/>
+      <xs:field xpath="email"/>
+    </xs:unique>
+  </xs:element>
+
+  <!-- Student Complex Type -->
+  <xs:complexType name="StudentType">
+    <xs:sequence>
+      <xs:element name="name" type="NameType"/>
+      <xs:element name="email" type="EmailType"/>
+      <xs:element name="department" type="DepartmentType"/>
+      <xs:element name="semester" type="SemesterType"/>
+      <xs:element name="marks" type="MarksType"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="StudentIdType" use="required"/>
+  </xs:complexType>
+
+  <!-- Student ID Type: Pattern S\d{3,} -->
+  <xs:simpleType name="StudentIdType">
+    <xs:restriction base="xs:ID">
+      <xs:pattern value="S[0-9]{3,}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Name Type: Max 50 chars, Alphabetic and spaces only -->
+  <xs:simpleType name="NameType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="50"/>
+      <xs:pattern value="[A-Za-z\s]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Email Type: RFC 5322 compatible pattern -->
+  <xs:simpleType name="EmailType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Department Type: Enumerated choices (CE, IT, EXTC) -->
+  <xs:simpleType name="DepartmentType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CE"/>
+      <xs:enumeration value="IT"/>
+      <xs:enumeration value="EXTC"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Semester Type: 1 <= semester <= 8 -->
+  <xs:simpleType name="SemesterType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="8"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Marks Type: 0 <= marks <= 100 -->
+  <xs:simpleType name="MarksType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

@@ -1,0 +1,14 @@
+<!-- 
+    students.dtd
+    Document Type Definition for Student Academic Information System
+-->
+
+<!ELEMENT students (student*)>
+<!ELEMENT student (name, email, department, semester, marks)>
+<!ATTLIST student id ID #REQUIRED>
+
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT email (#PCDATA)>
+<!ELEMENT department (#PCDATA)>
+<!ELEMENT semester (#PCDATA)>
+<!ELEMENT marks (#PCDATA)>
