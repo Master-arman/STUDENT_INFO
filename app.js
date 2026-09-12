@@ -85,15 +85,28 @@
     // Define StudentController
     app.controller('StudentController', ['$scope', '$http', '$timeout', function ($scope, $http, $timeout) {
 
-        // --- Core Model State ---
+        // --- Phase 7 State Declarations & Reactive Models ---
+        $scope.students = angular.copy(INITIAL_STUDENTS);
+
+        // Reactive models for form processing and searching
+        $scope.formData = {};
+        $scope.isEditing = false;
+        $scope.searchQuery = "";
+        $scope.selectedDept = "";
+        $scope.deptFilter = "ALL";
+        $scope.semesterFilter = "ALL";
+        $scope.statusMessage = "";
+        $scope.hasError = false;
+
+        $scope.departments = [
+            "Computer Engineering",
+            "Information Technology",
+            "Electronics"
+        ];
+
+        // Core App Modes
         $scope.role = 'admin'; // 'admin' | 'faculty'
         $scope.activeTab = 'tab-records';
-        $scope.students = [];
-
-        // Filters and Search Models (Two-way binding)
-        $scope.searchQuery = '';
-        $scope.deptFilter = 'ALL';
-        $scope.semesterFilter = 'ALL';
         $scope.sortField = 'id';
         $scope.sortReverse = false;
 
@@ -101,7 +114,6 @@
         $scope.isModalOpen = false;
         $scope.isViewModalOpen = false;
         $scope.formMode = 'create'; // 'create' | 'edit'
-        $scope.formData = {};
         $scope.formErrors = {};
         $scope.selectedStudent = null;
 
@@ -241,12 +253,13 @@
                 return;
             }
             $scope.formMode = 'create';
+            $scope.isEditing = false;
             $scope.formErrors = {};
             $scope.formData = {
                 id: $scope.generateNextId(),
                 name: '',
                 email: '',
-                department: 'CE',
+                department: $scope.departments[0],
                 semester: 1,
                 marks: ''
             };
@@ -260,6 +273,7 @@
                 return;
             }
             $scope.formMode = 'edit';
+            $scope.isEditing = true;
             $scope.formErrors = {};
             $scope.formData = angular.copy(student);
             $scope.originalId = student.id;
@@ -269,6 +283,7 @@
         // Close Modal
         $scope.closeModal = function () {
             $scope.isModalOpen = false;
+            $scope.isEditing = false;
             $scope.formData = {};
             $scope.formErrors = {};
         };
