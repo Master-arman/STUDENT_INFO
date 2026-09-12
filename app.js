@@ -298,124 +298,102 @@
             }
         };
 
-        // Edit Student Handler
-        $scope.editStudent = function (student) {
-            $scope.openEditModal(student);
-        };
+        // ==========================================
+        // Phase 10: Complete CRUD Operations
+        // ==========================================
 
-        // Generate next automatic ID
-        $scope.generateNextId = function () {
-            const existing = $scope.students.map(s => {
-                const m = (s.id || '').match(/^S(\d+)$/);
-                return m ? parseInt(m[1], 10) : 100;
-            });
-            const max = existing.length ? Math.max(...existing) : 100;
-            return `S${max + 1}`;
-        };
+        // CREATE & UPDATE HANDLER
+        $scope.saveStudent = function() {
+            $scope.clearMessages();
 
-        // Save Student (Create or Update)
-        $scope.saveStudent = function () {
-            if ($scope.role !== 'admin') return;
-
-            $scope.formErrors = {};
-            let isValid = true;
-
-            const id = ($scope.formData.id || '').trim();
-            const name = ($scope.formData.name || '').trim();
-            const email = ($scope.formData.email || '').trim();
-            const dept = $scope.formData.department;
-            const sem = parseInt($scope.formData.semester, 10);
-            const marks = parseFloat($scope.formData.marks);
-
-            // 1. ID Rule: S\d{3,} + XML ID uniqueness
-            const idPattern = /^S\d{3,}$/;
-            if (!idPattern.test(id)) {
-                $scope.formErrors.id = "Invalid ID! Must match pattern 'S' followed by 3+ digits (e.g. S101, S1001).";
-                isValid = false;
-            } else if ($scope.formMode === 'create' && $scope.students.some(s => s.id.toUpperCase() === id.toUpperCase())) {
-                $scope.formErrors.id = "Student ID must be unique across all records.";
-                isValid = false;
-            }
-
-            // 2. Name Rule: Max 50 chars, alphabetic and spaces
-            const namePattern = /^[A-Za-z\s]{1,50}$/;
-            if (!namePattern.test(name)) {
-                $scope.formErrors.name = "Name must contain only alphabetic characters and spaces (max 50 chars).";
-                isValid = false;
-            }
-
-            // 3. Email Rule: RFC 5322 pattern + uniqueness
-            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            if (!emailPattern.test(email)) {
-                $scope.formErrors.email = "Enter a valid RFC 5322 compliant institute email address.";
-                isValid = false;
-            } else {
-                const dup = $scope.students.find(s => 
-                    s.email.toLowerCase() === email.toLowerCase() && 
-                    ($scope.formMode === 'create' || s.id !== $scope.originalId)
-                );
-                if (dup) {
-                    $scope.formErrors.email = `Email is already registered to student ${dup.id}.`;
-                    isValid = false;
-                }
-            }
-
-            // 4. Department: [Computer Engineering, Information Technology, Electronics, CE, IT, EXTC]
-            const allowedDepts = ['Computer Engineering', 'Information Technology', 'Electronics', 'CE', 'IT', 'EXTC'];
-            if (!allowedDepts.includes(dept)) {
-                $scope.formErrors.department = "Department must be one of: Computer Engineering, Information Technology, Electronics (or CE, IT, EXTC).";
-                isValid = false;
-            }
-
-            // 5. Semester: 1 <= semester <= 8
-            if (isNaN(sem) || sem < 1 || sem > 8) {
-                $scope.formErrors.semester = "Semester must be an integer between 1 and 8.";
-                isValid = false;
-            }
-
-            // 6. Marks: 0 <= marks <= 100
-            if (isNaN(marks) || marks < 0 || marks > 100) {
-                $scope.formErrors.marks = "Marks score must be a number between 0.0 and 100.0.";
-                isValid = false;
-            }
-
-            if (!isValid) return;
-
-            const record = {
-                id: id,
-                name: name,
-                email: email,
-                department: dept,
-                semester: sem,
-                marks: marks
-            };
-
-            if ($scope.formMode === 'create') {
-                $scope.students.push(record);
-                $scope.showToast(`Enrolled new student ${id} successfully!`, 'success');
-            } else {
-                const idx = $scope.students.findIndex(s => s.id === $scope.originalId);
-                if (idx !== -1) {
-                    $scope.students[idx] = record;
-                    $scope.showToast(`Updated record for student ${id}!`, 'success');
-                }
-            }
-
-            $scope.saveState();
-            $scope.closeModal();
-        };
-
-        // Delete Student Record
-        $scope.deleteStudent = function (studentId) {
-            if ($scope.role !== 'admin') {
-                $scope.showToast('Administrator privileges required.', 'error');
+            if (!$scope.formData || !$scope.formData.id) {
+                $scope.notifyUser("Student ID is required.", true);
                 return;
             }
-            if (confirm(`Are you sure you want to delete student ${studentId}?`)) {
-                $scope.students = $scope.students.filter(s => s.id !== studentId);
+
+            if ($scope.isEditing) {
+                // UPDATE Existing Record
+                var targetIndex = $scope.students.findIndex(function(s) {
+                    return s.id === $scope.formData.id;
+                });
+
+                if (targetIndex !== -1) {
+                    $scope.students[targetIndex] = angular.copy($scope.formData);
+                    $scope.notifyUser("Student " + $scope.formData.id + " successfully updated.", false);
+                    $scope.saveState();
+                } else {
+                    $scope.notifyUser("Record update failed: Target ID not found.", true);
+                }
+            } else {
+                // CREATE New Record
+                var idCandidate = String($scope.formData.id).trim().toUpperCase();
+                var isDuplicate = $scope.students.some(function(s) {
+                    return s.id.toUpperCase() === idCandidate;
+                });
+
+                if (isDuplicate) {
+                    $scope.notifyUser("Error: Student ID '" + idCandidate + "' already exists. IDs must be unique.", true);
+                    return;
+                }
+
+                var newRecord = angular.copy($scope.formData);
+                newRecord.id = idCandidate;
+                $scope.students.push(newRecord);
+                $scope.notifyUser("Student registered successfully.", false);
                 $scope.saveState();
-                $scope.showToast(`Removed student ${studentId} from registry.`, 'success');
             }
+
+            $scope.resetForm();
+            if ($scope.isModalOpen) {
+                $scope.isModalOpen = false;
+            }
+        };
+
+        // READ / PRE-FILL FOR EDIT
+        $scope.editStudent = function(studentRecord) {
+            $scope.formData = angular.copy(studentRecord);
+            $scope.isEditing = true;
+            $scope.clearMessages();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // DELETE HANDLER
+        $scope.deleteStudent = function(studentId) {
+            if (confirm("Are you sure you want to permanently delete record: " + studentId + "?")) {
+                var initialLength = $scope.students.length;
+                $scope.students = $scope.students.filter(function(s) {
+                    return s.id !== studentId;
+                });
+
+                if ($scope.students.length < initialLength) {
+                    $scope.notifyUser("Student record " + studentId + " was removed.", false);
+                    if ($scope.formData.id === studentId) {
+                        $scope.resetForm();
+                    }
+                    $scope.saveState();
+                }
+            }
+        };
+
+        // HELPER STATE RESETS
+        $scope.resetForm = function() {
+            $scope.formData = {};
+            $scope.isEditing = false;
+            if ($scope.studentForm) {
+                $scope.studentForm.$setPristine();
+                $scope.studentForm.$setUntouched();
+            }
+        };
+
+        $scope.notifyUser = function(message, isError) {
+            $scope.statusMessage = message;
+            $scope.hasError = isError;
+            $scope.showToast(message, isError ? 'error' : 'success');
+        };
+
+        $scope.clearMessages = function() {
+            $scope.statusMessage = "";
+            $scope.hasError = false;
         };
 
         // View Student Grade Card Modal

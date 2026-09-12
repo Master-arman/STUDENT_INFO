@@ -184,6 +184,12 @@
                         </div>
                     </div>
 
+                    <!-- Status Notification Banner -->
+                    <div class="status-banner" ng-if="statusMessage" ng-class="{'status-banner-error': hasError, 'status-banner-success': !hasError}" style="margin: 1rem 1.5rem 0 1.5rem; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center;" ng-cloak>
+                        <span>{{ statusMessage }}</span>
+                        <button type="button" style="background:none; border:none; color:inherit; font-size:1.1rem; cursor:pointer;" ng-click="clearMessages()">&times;</button>
+                    </div>
+
                     <!-- Phase 8: Two-Way Data Binding & Form Engineering Component -->
                     <section class="card form-card admin-only" ng-if="role === 'admin'">
                         <div class="card-header">
