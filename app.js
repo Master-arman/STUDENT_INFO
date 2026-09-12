@@ -280,12 +280,27 @@
             $scope.isModalOpen = true;
         };
 
-        // Close Modal
+        // Close Modal & Reset Form
         $scope.closeModal = function () {
             $scope.isModalOpen = false;
-            $scope.isEditing = false;
+            $scope.resetForm();
+        };
+
+        // Reset Form State (Phase 8 Form Engineering)
+        $scope.resetForm = function () {
             $scope.formData = {};
+            $scope.isEditing = false;
+            $scope.formMode = 'create';
             $scope.formErrors = {};
+            if ($scope.studentForm) {
+                $scope.studentForm.$setPristine();
+                $scope.studentForm.$setUntouched();
+            }
+        };
+
+        // Edit Student Handler
+        $scope.editStudent = function (student) {
+            $scope.openEditModal(student);
         };
 
         // Generate next automatic ID

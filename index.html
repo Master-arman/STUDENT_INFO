@@ -184,6 +184,69 @@
                         </div>
                     </div>
 
+                    <!-- Phase 8: Two-Way Data Binding & Form Engineering Component -->
+                    <section class="card form-card admin-only" ng-if="role === 'admin'">
+                        <div class="card-header">
+                            <h3 class="form-card-title">{{ isEditing ? 'Modify Student Details' : 'Register New Student' }}</h3>
+                            <span class="badge" ng-class="{'badge-edit': isEditing, 'badge-new': !isEditing}">
+                                {{ isEditing ? 'Update Mode' : 'New Entry Mode' }}
+                            </span>
+                        </div>
+
+                        <form name="studentForm" ng-submit="saveStudent()" novalidate>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Student ID (Primary Key)</label>
+                                    <input type="text" name="studentId" class="form-control" ng-model="formData.id" 
+                                           placeholder="e.g., S106" ng-disabled="isEditing" required 
+                                           pattern="^S[0-9]{3,}$">
+                                    <small class="error-text" ng-show="studentForm.studentId.$dirty && studentForm.studentId.$invalid">
+                                        Must follow format 'S' followed by numbers (e.g. S106).
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Full Legal Name</label>
+                                    <input type="text" name="studentName" class="form-control" ng-model="formData.name" 
+                                           placeholder="Enter full name" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Academic Email</label>
+                                    <input type="email" name="studentEmail" class="form-control" ng-model="formData.email" 
+                                           placeholder="student@engg.edu" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Department</label>
+                                    <select class="form-control" ng-model="formData.department" required>
+                                        <option value="" disabled selected>Select Department</option>
+                                        <option ng-repeat="dept in departments" value="{{dept}}">{{dept}}</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Current Semester</label>
+                                    <input type="number" class="form-control" ng-model="formData.semester" min="1" max="8" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Aggregate Marks (%)</label>
+                                    <input type="number" class="form-control" ng-model="formData.marks" min="0" max="100" required>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-save" ng-disabled="studentForm.$invalid">
+                                    {{ isEditing ? 'Update Student Record' : 'Save Student' }}
+                                </button>
+                                <button type="button" class="btn btn-cancel" ng-click="resetForm()" ng-show="isEditing">
+                                    Cancel Edit
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
                     <!-- Mutating Student Data Table (ng-repeat) -->
                     <div class="table-container">
                         <table class="data-table">
