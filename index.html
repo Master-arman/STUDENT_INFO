@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="studentApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Student Information System | Hybrid Architecture &amp; AngularJS Engine</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- AngularJS Framework (CDN + Graceful Fallback) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script>
+        if (typeof angular === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js"><\/script>');
+        }
+    </script>
+</head>
+<body ng-controller="StudentController" ng-class="{'role-admin': role === 'admin', 'role-faculty': role === 'faculty'}">
+    <!-- Main App Container -->
+    <div class="app-layout">
+        <!-- Sidebar / Navigation Header -->
+        <header class="top-nav">
+            <div class="nav-brand">
+                <div class="brand-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/><path d="M6 14h10"/><path d="M18 2v20"/></svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">Academic Record Portal</h1>
+                    <p class="brand-subtitle">Hybrid Architecture: Native Presentation &amp; AngularJS Dynamic Pipeline</p>
+                </div>
+            </div>
+
+            <!-- Role Switcher & Controls -->
+            <div class="nav-actions">
+                <div class="role-switcher-container">
+                    <span class="role-label">Active Persona:</span>
+                    <div class="role-pill-group">
+                        <button class="role-btn" ng-class="{'active': role === 'admin'}" ng-click="setRole('admin')" title="Full CRUD privileges &amp; DTD validation">
+                            <span class="dot"></span> Administrator
+                        </button>
+                        <button class="role-btn" ng-class="{'active': role === 'faculty'}" ng-click="setRole('faculty')" title="Read-only access, inspection &amp; XSLT Grade Card generation">
+                            <span class="dot"></span> Faculty / Evaluator
+                        </button>
+                    </div>
+                </div>
+
+                <div class="quick-tools">
+                    <button class="btn btn-secondary" ng-click="exportXml()" title="Export database to valid students.xml">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export XML
+                    </button>
+                    <label class="btn btn-secondary file-upload-btn" title="Import XML file into system">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Import XML
+                        <input type="file" onchange="angular.element(this).scope().handleXmlImport(event)" accept=".xml" style="display:none;">
+                    </label>
+                    <button class="btn btn-icon" ng-click="resetData()" title="Reset to baseline dataset">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Role Notification Banner -->
+        <div class="role-banner" ng-class="{'admin-mode': role === 'admin', 'faculty-mode': role === 'faculty'}">
+            <div class="banner-content">
+                <span class="badge">{{ role === 'admin' ? 'ADMINISTRATOR MODE' : 'FACULTY / EVALUATOR MODE' }}</span>
+                <span ng-if="role === 'admin'">Full Privileges: Register new enrollments, modify records, remove dropouts, and validate XML against system DTD.</span>
+                <span ng-if="role === 'faculty'">Read-Only Mode: Search student records, inspect individual aggregate marks, and render XSLT grade cards.</span>
+            </div>
+        </div>
+
+        <!-- Main Content Layout -->
+        <main class="main-container">
+            <!-- Analytics Overview Cards -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon icon-students">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Enrolled Students</span>
+                        <h3 class="stat-value" ng-cloak>{{ getTotalStudents() }}</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-average">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Class Average Marks</span>
+                        <h3 class="stat-value" ng-cloak>{{ getAverageMarks() }}%</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-topper">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Highest Score</span>
+                        <h3 class="stat-value" ng-cloak>{{ getHighestMarks() }}%</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon icon-pass">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-label">Pass Percentage</span>
+                        <h3 class="stat-value" ng-cloak>{{ getPassRate() }}%</h3>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Navigation Tabs -->
+            <div class="tabs-nav">
+                <button class="tab-btn" ng-class="{'active': activeTab === 'tab-records'}" ng-click="switchTab('tab-records')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                    Student Records &amp; Directory
+                </button>
+                <button class="tab-btn" ng-class="{'active': activeTab === 'tab-xslt'}" ng-click="switchTab('tab-xslt')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    XSLT Presentation Pipeline
+                </button>
+                <button class="tab-btn" ng-class="{'active': activeTab === 'tab-dtd'}" ng-click="switchTab('tab-dtd')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    XML / DTD Verification Studio
+                </button>
+                <button class="tab-btn" ng-class="{'active': activeTab === 'tab-architecture'}" ng-click="switchTab('tab-architecture')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    Architecture &amp; Data Flow
+                </button>
+            </div>
+
+            <!-- TAB 1: Student Records & Registry (AngularJS Dynamic Application Pipeline) -->
+            <section id="tab-records" class="tab-pane" ng-class="{'active': activeTab === 'tab-records'}">
+                <div class="panel">
+                    <!-- Action & Filter Bar (Two-way model bindings) -->
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" ng-model="searchQuery" placeholder="Search by Student ID, Name, or Email...">
+                            <button class="clear-btn" ng-show="searchQuery" ng-click="searchQuery = ''">&times;</button>
+                        </div>
+
+                        <div class="filter-controls">
+                            <select ng-model="deptFilter" class="select-input">
+                                <option value="ALL">All Departments</option>
+                                <option value="CE">Computer Engg (CE)</option>
+                                <option value="IT">Information Tech (IT)</option>
+                                <option value="EXTC">Electronics &amp; Telecom (EXTC)</option>
+                            </select>
+
+                            <select ng-model="semesterFilter" class="select-input">
+                                <option value="ALL">All Semesters</option>
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5">Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+                            </select>
+
+                            <select class="select-input" ng-change="handleSortChange(sortChoice)" ng-model="sortChoice" ng-init="sortChoice='id-asc'">
+                                <option value="id-asc">Sort: ID (Ascending)</option>
+                                <option value="id-desc">Sort: ID (Descending)</option>
+                                <option value="name-asc">Sort: Name (A-Z)</option>
+                                <option value="marks-desc">Sort: Marks (High to Low)</option>
+                                <option value="marks-asc">Sort: Marks (Low to High)</option>
+                            </select>
+
+                            <button class="btn btn-primary admin-only" ng-click="openAddModal()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Enroll Student
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mutating Student Data Table (ng-repeat) -->
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email Address</th>
+                                    <th>Department</th>
+                                    <th>Semester</th>
+                                    <th>Marks (%)</th>
+                                    <th>Grade Status</th>
+                                    <th class="actions-header">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="student in filteredStudents = (students | filter:customFilter | orderBy:sortField:sortReverse)" ng-cloak>
+                                    <td><span class="student-id-cell">{{ student.id }}</span></td>
+                                    <td><span class="student-name-cell">{{ student.name }}</span></td>
+                                    <td><span class="student-email-cell">{{ student.email }}</span></td>
+                                    <td><span class="dept-pill {{ student.department }}">{{ student.department }}</span></td>
+                                    <td>Semester {{ student.semester }}</td>
+                                    <td><span class="marks-val">{{ student.marks | number:1 }}%</span></td>
+                                    <td>
+                                        <span class="status-pill" ng-class="{'pass': student.marks >= 40, 'fail': student.marks < 40}">
+                                            {{ student.marks >= 40 ? 'PASS' : 'FAIL' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="row-actions">
+                                            <button class="action-btn view-btn" ng-click="viewStudentCard(student)" title="View Academic Transcript Card">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                                Grade Card
+                                            </button>
+                                            <button class="action-btn edit-btn admin-only" ng-if="role === 'admin'" ng-click="openEditModal(student)" title="Edit Record">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                                                Edit
+                                            </button>
+                                            <button class="action-btn delete-btn admin-only" ng-if="role === 'admin'" ng-click="deleteStudent(student.id)" title="Remove Record">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Empty State -->
+                        <div class="empty-state" ng-show="filteredStudents.length === 0" ng-cloak>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                            <h3>No Student Records Found</h3>
+                            <p>Try adjusting your search criteria or register a new enrollment.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: XSLT Presentation Pipeline (students.xml + students.xsl) -->
+            <section id="tab-xslt" class="tab-pane" ng-class="{'active': activeTab === 'tab-xslt'}">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="panel-title">Data Presentation Pipeline (Native Browser Engine)</h2>
+                            <p class="panel-subtitle">Transforms <code>students.xml</code> via <code>students.xsl</code> into styled academic transcripts</p>
+                        </div>
+                        <div class="panel-actions">
+                            <button class="btn btn-secondary" onclick="window.print()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                                Print / Save PDF
+                            </button>
+                            <button class="btn btn-primary" ng-click="renderXslt()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                Re-run Transformation
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Render Container -->
+                    <div class="xslt-viewer-frame">
+                        <div id="xsltRenderOutput" class="xslt-output-container">
+                            <!-- Injected live XSLT HTML -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: XML & DTD Studio -->
+            <section id="tab-dtd" class="tab-pane" ng-class="{'active': activeTab === 'tab-dtd'}">
+                <div class="grid-2col">
+                    <!-- Live XML Editor / Inspector -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h3 class="panel-title">Live XML Document</h3>
+                                <p class="panel-subtitle">Synchronized <code>students.xml</code> data representation</p>
+                            </div>
+                            <div class="panel-actions">
+                                <button class="btn btn-success" ng-click="validateXmlDtd()">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    Verify Integrity vs DTD
+                                </button>
+                            </div>
+                        </div>
+                        <div class="editor-wrapper">
+                            <textarea ng-model="xmlCode" spellcheck="false" class="code-editor"></textarea>
+                        </div>
+                        <div class="editor-footer">
+                            <span class="editor-hint">Edit directly and click "Verify Integrity vs DTD" to validate and sync.</span>
+                            <button class="btn btn-sm btn-secondary admin-only" ng-if="role === 'admin'" ng-click="applyXmlToRegistry()">Apply XML to Registry</button>
+                        </div>
+                    </div>
+
+                    <!-- DTD Schema & Validation Diagnostics -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <h3 class="panel-title">DTD Schema &amp; Diagnostics</h3>
+                                <p class="panel-subtitle">Rule Enforcement &amp; ID Constraint Verification</p>
+                            </div>
+                        </div>
+
+                        <div class="dtd-viewer">
+                            <pre><code class="language-dtd">&lt;!ELEMENT students (student*)&gt;
+&lt;!ELEMENT student (name, email, department, semester, marks)&gt;
+&lt;!ATTLIST student id ID #REQUIRED&gt;
+&lt;!ELEMENT name (#PCDATA)&gt;
+&lt;!ELEMENT email (#PCDATA)&gt;
+&lt;!ELEMENT department (#PCDATA)&gt;
+&lt;!ELEMENT semester (#PCDATA)&gt;
+&lt;!ELEMENT marks (#PCDATA)&gt;</code></pre>
+                        </div>
+
+                        <div class="diagnostics-card" id="validationResultCard" ng-cloak>
+                            <div class="diag-header">
+                                <span class="diag-badge" ng-class="{'pass': validationResult.isValid, 'fail': !validationResult.isValid}">
+                                    {{ validationResult.isValid ? 'SCHEMA & DTD VALID' : 'VALIDATION FAILED' }}
+                                </span>
+                                <span class="diag-title">{{ validationResult.isValid ? 'All ' + validationResult.studentCount + ' XML records conform to DTD & constraints' : 'Found ' + validationResult.errors.length + ' schema / constraint violation(s):' }}</span>
+                            </div>
+                            <ul class="diag-list" ng-if="validationResult.isValid">
+                                <li>All student IDs match XML ID constraint &amp; regex <code>S\d{3,}</code></li>
+                                <li>All emails conform to RFC 5322 pattern &amp; uniqueness</li>
+                                <li>Department values restricted to [CE, IT, EXTC]</li>
+                                <li>Semester range bounded [1-8]</li>
+                                <li>Marks values bounded [0-100]</li>
+                            </ul>
+                            <ul class="diag-list" ng-if="!validationResult.isValid">
+                                <li class="error-item" ng-repeat="err in validationResult.errors">{{ err }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: Hybrid System Architecture & Data Flow Reference -->
+            <section id="tab-architecture" class="tab-pane" ng-class="{'active': activeTab === 'tab-architecture'}">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2 class="panel-title">Hybrid System Architecture &amp; Data Flow</h2>
+                            <p class="panel-subtitle">Two parallel pipelines: Native XML presentation and AngularJS dynamic application engine</p>
+                        </div>
+                    </div>
+
+                    <div style="padding: 1.5rem;">
+                        <div style="background: #0f172a; color: #38bdf8; padding: 1.5rem; border-radius: 12px; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.5; overflow-x: auto; margin-bottom: 1.5rem;">
+<pre style="margin:0;">
+[ Data Presentation Pipeline ]
++-------------------+        +--------------------+
+|   students.xml    | -----&gt; |    students.dtd    | (Structural Validation)
++-------------------+        +--------------------+
+          |
+          v
++-------------------+
+|   students.xsl    | -----&gt; [ Native Browser Engine ] -----&gt; Styled HTML Report
++-------------------+
+
+--------------------------------------------------------------------------------
+
+[ Dynamic Application Pipeline ]
++-------------------+
+|   students.xml    |
++-------------------+
+          |
+     (DOMParser /
+       $http.get)
+          v
++-----------------------------------------------------------------------------+
+| AngularJS Client Runtime (app.js)                                           |
+|  - $scope.students: In-memory Collection                                    |
+|  - Two-Way Model Binding (ng-model)                                         |
+|  - Real-Time Query Filter (ng-repeat="s in students | filter:query")        |
+|  - CRUD Event Handlers (saveStudent, editStudent, deleteStudent)            |
++-----------------------------------------------------------------------------+
+          |
+          v
++-----------------------------------------------------------------------------+
+| Interactive Single Page Dashboard (index.html + style.css)                 |
+|  - Responsive Form Grid                                                     |
+|  - Live Search Toolbar                                                      |
+|  - Mutating Student Data Table                                              |
++-----------------------------------------------------------------------------+
+</pre>
+                        </div>
+
+                        <!-- Entity Data Dictionary Quick Reference -->
+                        <h3 style="margin-bottom: 1rem; color: var(--text-heading); font-size: 1.1rem;">Entity Data Dictionary</h3>
+                        <div class="dictionary-table-wrapper">
+                            <table class="dictionary-table">
+                                <thead>
+                                    <tr>
+                                        <th>Field Name</th>
+                                        <th>Type / Format</th>
+                                        <th>Constraints</th>
+                                        <th>System Rule &amp; Pattern</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>id</code></td>
+                                        <td><span class="type-badge">String</span></td>
+                                        <td><span class="constraint-pill pk">Primary Key</span> <span class="constraint-pill req">Required</span> <span class="constraint-pill">XML ID</span></td>
+                                        <td><code>^S\d{3,}$</code> (e.g., S101, S102)</td>
+                                        <td>Unique identifier for student enrollment, conforming to XML ID token requirements.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>name</code></td>
+                                        <td><span class="type-badge">String</span></td>
+                                        <td><span class="constraint-pill req">Required</span> <span class="constraint-pill">Max 50 Chars</span></td>
+                                        <td><code>^[A-Za-z\s]{1,50}$</code></td>
+                                        <td>Student's registered full name (Alphabetic characters and whitespace only).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>email</code></td>
+                                        <td><span class="type-badge">String</span></td>
+                                        <td><span class="constraint-pill req">Required</span> <span class="constraint-pill">Unique</span></td>
+                                        <td>RFC 5322 Email regex pattern</td>
+                                        <td>Institute-issued communication address for academic notifications.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>department</code></td>
+                                        <td><span class="type-badge">Enumerated</span></td>
+                                        <td><span class="constraint-pill req">Required</span></td>
+                                        <td><code>CE | IT | EXTC</code></td>
+                                        <td>Degree branch (Computer Engg, Information Tech, Electronics &amp; Telecom).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>semester</code></td>
+                                        <td><span class="type-badge">Integer</span></td>
+                                        <td><span class="constraint-pill req">Required</span></td>
+                                        <td><code>1 &le; semester &le; 8</code></td>
+                                        <td>Current enrolled academic term within the standard 4-year undergraduate degree.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>marks</code></td>
+                                        <td><span class="type-badge">Float / Int</span></td>
+                                        <td><span class="constraint-pill req">Required</span></td>
+                                        <td><code>0.0 &le; marks &le; 100.0</code></td>
+                                        <td>Aggregate percentage / academic performance score.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Student Enrollment / Edit Modal Form (Two-Way Binding) -->
+    <div class="modal-backdrop" ng-class="{'show': isModalOpen}">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3>{{ formMode === 'create' ? 'Enroll New Student' : 'Edit Student Record (' + formData.id + ')' }}</h3>
+                <button type="button" class="modal-close-btn" ng-click="closeModal()">&times;</button>
+            </div>
+            <form ng-submit="saveStudent()" novalidate>
+                <div class="modal-body">
+                    <!-- Student ID -->
+                    <div class="form-group">
+                        <label for="studentId">Student ID (XML ID) <span class="required-star">*</span></label>
+                        <input type="text" id="studentId" class="form-control" ng-class="{'is-invalid': formErrors.id}" ng-model="formData.id" ng-disabled="formMode === 'edit'" placeholder="e.g. S107" required>
+                        <small class="field-hint">Must start with 'S' followed by 3 or more digits (e.g. S101, S1001).</small>
+                        <div class="error-msg">{{ formErrors.id }}</div>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="studentName">Student Full Name <span class="required-star">*</span></label>
+                        <input type="text" id="studentName" class="form-control" ng-class="{'is-invalid': formErrors.name}" ng-model="formData.name" placeholder="e.g. Divya Deshmukh" maxlength="50" required>
+                        <small class="field-hint">Maximum 50 characters, letters and spaces only.</small>
+                        <div class="error-msg">{{ formErrors.name }}</div>
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="form-group">
+                        <label for="studentEmail">Institute Email Address <span class="required-star">*</span></label>
+                        <input type="email" id="studentEmail" class="form-control" ng-class="{'is-invalid': formErrors.email}" ng-model="formData.email" placeholder="e.g. divya.deshmukh@inst.edu" required>
+                        <small class="field-hint">Must be a valid RFC 5322 format and unique across records.</small>
+                        <div class="error-msg">{{ formErrors.email }}</div>
+                    </div>
+
+                    <div class="form-row">
+                        <!-- Department -->
+                        <div class="form-group col-half">
+                            <label for="studentDept">Department <span class="required-star">*</span></label>
+                            <select id="studentDept" class="form-control" ng-model="formData.department" required>
+                                <option value="CE">Computer Engineering (CE)</option>
+                                <option value="IT">Information Technology (IT)</option>
+                                <option value="EXTC">Electronics &amp; Telecom (EXTC)</option>
+                            </select>
+                            <div class="error-msg">{{ formErrors.department }}</div>
+                        </div>
+
+                        <!-- Semester -->
+                        <div class="form-group col-half">
+                            <label for="studentSemester">Semester (1 - 8) <span class="required-star">*</span></label>
+                            <input type="number" id="studentSemester" class="form-control" ng-class="{'is-invalid': formErrors.semester}" ng-model="formData.semester" min="1" max="8" required>
+                            <div class="error-msg">{{ formErrors.semester }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Marks -->
+                    <div class="form-group">
+                        <label for="studentMarks">Aggregate Marks / Score (%) <span class="required-star">*</span></label>
+                        <input type="number" id="studentMarks" class="form-control" ng-class="{'is-invalid': formErrors.marks}" ng-model="formData.marks" min="0" max="100" step="0.1" placeholder="e.g. 85.5" required>
+                        <small class="field-hint">Value between 0.0 and 100.0</small>
+                        <div class="error-msg">{{ formErrors.marks }}</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" ng-click="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Detail / Grade Card Modal -->
+    <div class="modal-backdrop" ng-class="{'show': isViewModalOpen}" ng-cloak>
+        <div class="modal-dialog modal-card-dialog">
+            <div class="modal-header">
+                <h3>Academic Transcript Card</h3>
+                <button type="button" class="modal-close-btn" ng-click="closeViewModal()">&times;</button>
+            </div>
+            <div class="modal-body" ng-if="selectedStudent">
+                <div class="grade-card" style="box-shadow:none; border:none; padding:0;">
+                    <div class="card-top">
+                        <span class="student-id" style="font-size:1.1rem; padding:6px 14px;">{{ selectedStudent.id }}</span>
+                        <span class="dept-pill {{ selectedStudent.department }}">{{ selectedStudent.department }} Department</span>
+                    </div>
+                    <h2 class="student-name" style="font-size:1.4rem; margin-top:0.75rem;">{{ selectedStudent.name }}</h2>
+                    <div class="student-email" style="font-size:0.9rem;">{{ selectedStudent.email }}</div>
+
+                    <div class="details-grid" style="margin: 1.25rem 0;">
+                        <div>
+                            <div class="detail-label">Current Term</div>
+                            <div class="detail-value">Semester {{ selectedStudent.semester }}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Evaluation Status</div>
+                            <div class="detail-value" ng-class="{'status-pass': selectedStudent.isPass, 'status-fail': !selectedStudent.isPass}">
+                                {{ selectedStudent.isPass ? 'PASSED' : 'ARREAR' }}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Percentage Score</div>
+                            <div class="detail-value" style="font-size:1.2rem; color:var(--primary); font-weight:800;">{{ selectedStudent.marks | number:1 }}%</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Awarded Grade</div>
+                            <div class="detail-value">
+                                <span class="grade-badge {{ selectedStudent.gradeClass }}">Grade {{ selectedStudent.gradeLetter }} ({{ selectedStudent.gradeLabel }})</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background:#f1f5f9; padding:12px; border-radius:8px; font-size:0.75rem; color:#64748b; line-height:1.4;">
+                        <strong>System Record Verification:</strong> Verified against Document Type Definition (DTD) &amp; Schema constraints. Record ID token conforming to XML 1.0 ID standards.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="window.print()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    Print Transcript
+                </button>
+                <button type="button" class="btn btn-primary" ng-click="closeViewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" ng-class="{'show': toast.show, 'toast-success': toast.type === 'success', 'toast-error': toast.type === 'error'}" ng-cloak>
+        <div class="toast-content">{{ toast.message }}</div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
