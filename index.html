@@ -307,9 +307,16 @@
                         </div>
 
                         <div class="dtd-viewer">
-                            <pre><code class="language-dtd">&lt;!ELEMENT students (student*)&gt;
+                            <pre><code class="language-dtd">&lt;!-- The root element 'students' must contain one or more 'student' records --&gt;
+&lt;!ELEMENT students (student+)&gt;
+
+&lt;!-- Each 'student' node requires an exact sequence of children --&gt;
 &lt;!ELEMENT student (name, email, department, semester, marks)&gt;
+
+&lt;!-- The 'id' attribute must be unique across the document and cannot be omitted --&gt;
 &lt;!ATTLIST student id ID #REQUIRED&gt;
+
+&lt;!-- Element textual payload definitions --&gt;
 &lt;!ELEMENT name (#PCDATA)&gt;
 &lt;!ELEMENT email (#PCDATA)&gt;
 &lt;!ELEMENT department (#PCDATA)&gt;

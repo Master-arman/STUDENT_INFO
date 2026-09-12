@@ -1,12 +1,13 @@
-<!-- 
-    students.dtd
-    Document Type Definition for Student Academic Information System
--->
+<!-- The root element 'students' must contain one or more 'student' records -->
+<!ELEMENT students (student+)>
 
-<!ELEMENT students (student*)>
+<!-- Each 'student' node requires an exact sequence of children: name, email, department, semester, and marks -->
 <!ELEMENT student (name, email, department, semester, marks)>
+
+<!-- The 'id' attribute must be unique across the document and cannot be omitted -->
 <!ATTLIST student id ID #REQUIRED>
 
+<!-- Element textual payload definitions -->
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT email (#PCDATA)>
 <!ELEMENT department (#PCDATA)>

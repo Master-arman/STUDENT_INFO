@@ -477,6 +477,13 @@
             const studentElements = doc.querySelectorAll('students > student');
             diag.studentCount = studentElements.length;
 
+            // DTD Rule: <!ELEMENT students (student+)> (At least one student required)
+            if (studentElements.length === 0) {
+                diag.isValid = false;
+                diag.errors.push("DTD Violation: Root element <students> must contain at least one <student> record (enforced by student+).");
+                return diag;
+            }
+
             const ids = new Set();
             const emails = new Set();
 
