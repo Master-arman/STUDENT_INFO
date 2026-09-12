@@ -54,9 +54,12 @@
     </xs:restriction>
   </xs:simpleType>
 
-  <!-- Department Type: Enumerated choices (CE, IT, EXTC) -->
+  <!-- Department Type: Enumerated choices -->
   <xs:simpleType name="DepartmentType">
     <xs:restriction base="xs:string">
+      <xs:enumeration value="Computer Engineering"/>
+      <xs:enumeration value="Information Technology"/>
+      <xs:enumeration value="Electronics"/>
       <xs:enumeration value="CE"/>
       <xs:enumeration value="IT"/>
       <xs:enumeration value="EXTC"/>

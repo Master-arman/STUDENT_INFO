@@ -1,47 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE students SYSTEM "students.dtd">
 <?xml-stylesheet type="text/xsl" href="students.xsl"?>
+<!DOCTYPE students SYSTEM "students.dtd">
 <students>
     <student id="S101">
         <name>Aarav Sharma</name>
-        <email>aarav.sharma@inst.edu</email>
-        <department>CE</department>
+        <email>aarav.sharma@engg.edu</email>
+        <department>Computer Engineering</department>
         <semester>6</semester>
-        <marks>92.5</marks>
+        <marks>88</marks>
     </student>
     <student id="S102">
-        <name>Priya Patel</name>
-        <email>priya.patel@inst.edu</email>
-        <department>IT</department>
+        <name>Neha Patel</name>
+        <email>neha.patel@engg.edu</email>
+        <department>Information Technology</department>
         <semester>4</semester>
-        <marks>88.0</marks>
+        <marks>92</marks>
     </student>
     <student id="S103">
-        <name>Rohan Kulkarni</name>
-        <email>rohan.kulkarni@inst.edu</email>
-        <department>EXTC</department>
-        <semester>8</semester>
-        <marks>74.5</marks>
+        <name>Rohan Mehta</name>
+        <email>rohan.mehta@engg.edu</email>
+        <department>Electronics</department>
+        <semester>6</semester>
+        <marks>74</marks>
     </student>
     <student id="S104">
-        <name>Ananya Iyer</name>
-        <email>ananya.iyer@inst.edu</email>
-        <department>CE</department>
-        <semester>6</semester>
-        <marks>95.0</marks>
+        <name>Pooja Verma</name>
+        <email>pooja.verma@engg.edu</email>
+        <department>Computer Engineering</department>
+        <semester>8</semester>
+        <marks>65</marks>
     </student>
     <student id="S105">
-        <name>Vikram Singh</name>
-        <email>vikram.singh@inst.edu</email>
-        <department>IT</department>
+        <name>Siddharth Rao</name>
+        <email>siddharth.rao@engg.edu</email>
+        <department>Information Technology</department>
         <semester>2</semester>
-        <marks>63.0</marks>
-    </student>
-    <student id="S106">
-        <name>Sneha Nair</name>
-        <email>sneha.nair@inst.edu</email>
-        <department>EXTC</department>
-        <semester>5</semester>
-        <marks>81.2</marks>
+        <marks>38</marks>
     </student>
 </students>

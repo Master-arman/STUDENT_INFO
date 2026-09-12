@@ -9,14 +9,13 @@
 (function () {
     'use strict';
 
-    // Baseline Initial Records
+    // Baseline Initial Records (Phase 3 Canonical Database)
     const INITIAL_STUDENTS = [
-        { id: "S101", name: "Aarav Sharma", email: "aarav.sharma@inst.edu", department: "CE", semester: 6, marks: 92.5 },
-        { id: "S102", name: "Priya Patel", email: "priya.patel@inst.edu", department: "IT", semester: 4, marks: 88.0 },
-        { id: "S103", name: "Rohan Kulkarni", email: "rohan.kulkarni@inst.edu", department: "EXTC", semester: 8, marks: 74.5 },
-        { id: "S104", name: "Ananya Iyer", email: "ananya.iyer@inst.edu", department: "CE", semester: 6, marks: 95.0 },
-        { id: "S105", name: "Vikram Singh", email: "vikram.singh@inst.edu", department: "IT", semester: 2, marks: 63.0 },
-        { id: "S106", name: "Sneha Nair", email: "sneha.nair@inst.edu", department: "EXTC", semester: 5, marks: 81.2 }
+        { id: "S101", name: "Aarav Sharma", email: "aarav.sharma@engg.edu", department: "Computer Engineering", semester: 6, marks: 88 },
+        { id: "S102", name: "Neha Patel", email: "neha.patel@engg.edu", department: "Information Technology", semester: 4, marks: 92 },
+        { id: "S103", name: "Rohan Mehta", email: "rohan.mehta@engg.edu", department: "Electronics", semester: 6, marks: 74 },
+        { id: "S104", name: "Pooja Verma", email: "pooja.verma@engg.edu", department: "Computer Engineering", semester: 8, marks: 65 },
+        { id: "S105", name: "Siddharth Rao", email: "siddharth.rao@engg.edu", department: "Information Technology", semester: 2, marks: 38 }
     ];
 
     // Embedded XSLT Stylesheet for client-side XSLT rendering
@@ -334,9 +333,10 @@
                 }
             }
 
-            // 4. Department: [CE, IT, EXTC]
-            if (!['CE', 'IT', 'EXTC'].includes(dept)) {
-                $scope.formErrors.department = "Department must be one of: CE, IT, EXTC.";
+            // 4. Department: [Computer Engineering, Information Technology, Electronics, CE, IT, EXTC]
+            const allowedDepts = ['Computer Engineering', 'Information Technology', 'Electronics', 'CE', 'IT', 'EXTC'];
+            if (!allowedDepts.includes(dept)) {
+                $scope.formErrors.department = "Department must be one of: Computer Engineering, Information Technology, Electronics (or CE, IT, EXTC).";
                 isValid = false;
             }
 
@@ -534,9 +534,9 @@
                 if (!deptEl) {
                     diag.isValid = false;
                     diag.errors.push(`Student #${idx}: Missing child element <department>`);
-                } else if (!['CE', 'IT', 'EXTC'].includes(deptEl.textContent.trim())) {
+                } else if (!['Computer Engineering', 'Information Technology', 'Electronics', 'CE', 'IT', 'EXTC'].includes(deptEl.textContent.trim())) {
                     diag.isValid = false;
-                    diag.errors.push(`Student ${id || '#' + idx}: Department '${deptEl.textContent}' invalid. Allowed: [CE, IT, EXTC]`);
+                    diag.errors.push(`Student ${id || '#' + idx}: Department '${deptEl.textContent}' invalid. Allowed: [Computer Engineering, Information Technology, Electronics]`);
                 }
 
                 if (!semEl) {

@@ -94,9 +94,9 @@
                     border-radius: 20px;
                     text-transform: uppercase;
                 }
-                .dept-CE { background: #dbeafe; color: #1e40af; }
-                .dept-IT { background: #dcfce7; color: #166534; }
-                .dept-EXTC { background: #fef3c7; color: #92400e; }
+                .dept-CE, [class*="dept-Computer"] { background: #dbeafe; color: #1e40af; }
+                .dept-IT, [class*="dept-Information"] { background: #dcfce7; color: #166534; }
+                .dept-EXTC, [class*="dept-Electronics"] { background: #fef3c7; color: #92400e; }
 
                 .student-name {
                     font-size: 18px;

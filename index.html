@@ -152,9 +152,9 @@
                         <div class="filter-controls">
                             <select ng-model="deptFilter" class="select-input">
                                 <option value="ALL">All Departments</option>
-                                <option value="CE">Computer Engg (CE)</option>
-                                <option value="IT">Information Tech (IT)</option>
-                                <option value="EXTC">Electronics &amp; Telecom (EXTC)</option>
+                                <option value="Computer Engineering">Computer Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics">Electronics</option>
                             </select>
 
                             <select ng-model="semesterFilter" class="select-input">
@@ -493,9 +493,9 @@
                         <div class="form-group col-half">
                             <label for="studentDept">Department <span class="required-star">*</span></label>
                             <select id="studentDept" class="form-control" ng-model="formData.department" required>
-                                <option value="CE">Computer Engineering (CE)</option>
-                                <option value="IT">Information Technology (IT)</option>
-                                <option value="EXTC">Electronics &amp; Telecom (EXTC)</option>
+                                <option value="Computer Engineering">Computer Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics">Electronics</option>
                             </select>
                             <div class="error-msg">{{ formErrors.department }}</div>
                         </div>

@@ -611,9 +611,9 @@ body.role-faculty .admin-only {
     border-radius: var(--radius-full);
 }
 
-.dept-pill.CE { background: #dbeafe; color: #1e40af; }
-.dept-pill.IT { background: #dcfce7; color: #166534; }
-.dept-pill.EXTC { background: #fef3c7; color: #92400e; }
+.dept-pill.CE, .dept-pill[class*="Computer"] { background: #dbeafe; color: #1e40af; }
+.dept-pill.IT, .dept-pill[class*="Information"] { background: #dcfce7; color: #166534; }
+.dept-pill.EXTC, .dept-pill[class*="Electronics"] { background: #fef3c7; color: #92400e; }
 
 /* Status Badges */
 .status-pill {
