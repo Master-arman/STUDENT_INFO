@@ -178,8 +178,13 @@
 
         // --- Initialization Lifecycle ---
         $scope.init = function () {
-            $scope.loadData();
-            $scope.loadFromXML(); // Phase 12: Asynchronous sync from students.xml
+            const savedData = localStorage.getItem('STUDENT_INFO_DATA');
+            if (savedData) {
+                $scope.loadData();
+            } else {
+                // Initial visit: hydrate from students.xml
+                $scope.loadFromXML();
+            }
             $scope.syncXmlCode();
             $timeout(function () {
                 $scope.renderXslt();
