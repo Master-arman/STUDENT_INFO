@@ -467,18 +467,24 @@
 
         // --- XML & DTD Studio Operations ---
 
-        $scope.generateXmlString = function (list = $scope.students) {
+        $scope.generateXmlString = function (list) {
+            const dataList = (list && angular.isArray(list)) ? list : ($scope.students || []);
             let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-            xml += `<!DOCTYPE students SYSTEM "students.dtd">\n`;
             xml += `<?xml-stylesheet type="text/xsl" href="students.xsl"?>\n`;
+            xml += `<!DOCTYPE students SYSTEM "students.dtd">\n`;
             xml += `<students>\n`;
-            list.forEach(s => {
-                xml += `    <student id="${$scope.escapeXml(s.id)}">\n`;
-                xml += `        <name>${$scope.escapeXml(s.name)}</name>\n`;
-                xml += `        <email>${$scope.escapeXml(s.email)}</email>\n`;
-                xml += `        <department>${$scope.escapeXml(s.department)}</department>\n`;
-                xml += `        <semester>${s.semester}</semester>\n`;
-                xml += `        <marks>${Number(s.marks).toFixed(1)}</marks>\n`;
+            dataList.forEach(s => {
+                let marksVal = '0';
+                if (s.marks !== undefined && s.marks !== null && !isNaN(s.marks)) {
+                    const num = Number(s.marks);
+                    marksVal = (num % 1 === 0) ? num.toString() : num.toFixed(1);
+                }
+                xml += `    <student id="${$scope.escapeXml(s.id || '')}">\n`;
+                xml += `        <name>${$scope.escapeXml(s.name || '')}</name>\n`;
+                xml += `        <email>${$scope.escapeXml(s.email || '')}</email>\n`;
+                xml += `        <department>${$scope.escapeXml(s.department || '')}</department>\n`;
+                xml += `        <semester>${s.semester || 1}</semester>\n`;
+                xml += `        <marks>${marksVal}</marks>\n`;
                 xml += `    </student>\n`;
             });
             xml += `</students>\n`;
@@ -748,17 +754,66 @@
 
         // --- Import / Export ---
         $scope.exportXml = function () {
-            const xml = $scope.generateXmlString();
-            const blob = new Blob([xml], { type: 'application/xml;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'students.xml';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            $scope.showToast('Exported students.xml successfully!', 'success');
+            try {
+                // If in XML Studio tab and user made edits, use current editor code if valid, otherwise generate fresh XML
+                let xml = '';
+                if ($scope.activeTab === 'tab-dtd' && $scope.xmlCode && $scope.xmlCode.trim().length > 0) {
+                    xml = $scope.xmlCode;
+                } else {
+                    xml = $scope.generateXmlString();
+                }
+
+                const blob = new Blob([xml], { type: 'application/xml;charset=utf-8' });
+                
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(blob, 'students.xml');
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'students.xml';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function () {
+                        if (a.parentNode) {
+                            a.parentNode.removeChild(a);
+                        }
+                        URL.revokeObjectURL(url);
+                    }, 1500);
+                }
+                $scope.showToast('Exported students.xml successfully!', 'success');
+            } catch (err) {
+                console.error("Export XML Error:", err);
+                $scope.showToast('Failed to export XML: ' + err.message, 'error');
+            }
+        };
+
+        $scope.copyXmlToClipboard = function () {
+            const text = ($scope.activeTab === 'tab-dtd' && $scope.xmlCode) ? $scope.xmlCode : $scope.generateXmlString();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function () {
+                    $scope.$apply(function () {
+                        $scope.showToast('XML copied to clipboard!', 'success');
+                    });
+                }).catch(function () {
+                    $scope.showToast('Failed to copy to clipboard', 'error');
+                });
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    $scope.showToast('XML copied to clipboard!', 'success');
+                } catch (e) {
+                    $scope.showToast('Failed to copy XML', 'error');
+                }
+                document.body.removeChild(textarea);
+            }
         };
 
         $scope.handleXmlImport = function ($event) {
